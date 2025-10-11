@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: ai-manus
+  profiles:
+    active: local
+#  datasource:
+#    url: xxx
+#    username: xxx
+#    password: xxx
+
+  ai:
+    openai:
+      base-url: https://openrouter.ai/api
+      api-key: your-api-key
+      chat:
+        options:
+          model: openai/gpt-oss-20b:free
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: gemma3:1b
+
+#    mcp:
+#      client:
+#        sse:
+#          connections:
+#            server1:
+#              url: http://localhost:8127
+#        stdio:
+#          servers-configuration: classpath:mcp-servers.json
+
+#    vectorstore:
+#      pgvector:
+#        index-type: HNSW
+#        dimensions: 1536
+#        distance-type: COSINE_DISTANCE
+#        max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
+
+#  server:
+#    port: 8123
+#    servlet:
+#      context-path: /api
+
+#  springdoc:
+#    swagger-ui:
+#      path: /swagger-ui.html
+#      tags-sorter: alpha
+#      operations-sorter: alpha
+#    api-docs:
+#      path: /v3/api-docs
+#    group-configs:
+#      - group: 'default'
+#        paths-to-match: '/**'
+#        packages-to-scan: com.devforgely.aimanusbackend.controller
+
+  knife4j:
+    enable: true
+    settings:
+      language: en-gb
+#
+#  search-api:
+#    api-key: your-api-key
+
+  logging:
+    level:
+      org.springframework.ai: DEBUG
