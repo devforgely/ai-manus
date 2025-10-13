@@ -9,15 +9,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 // if annotation uncommented then the code will run on startup
-@Component
+//@Component
 public class SpringAiAiInvoke implements CommandLineRunner {
     @Resource
     @Qualifier("openAiChatModel")
-    private ChatModel chatModel;
+    private ChatModel openAiChatModel;
 
     @Override
     public void run(String... args) {
-        AssistantMessage assistantMessage = chatModel.call(new Prompt("Hello World"))
+        AssistantMessage assistantMessage = openAiChatModel.call(new Prompt("Hello World"))
                 .getResult()
                 .getOutput();
         System.out.println(assistantMessage.getText());
