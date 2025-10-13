@@ -34,3 +34,6 @@ build/
 
 ### Configuration ###
 application-local.yaml
+
+### Testing ###
+/tmp/

@@ -36,31 +36,31 @@ spring:
 #        distance-type: COSINE_DISTANCE
 #        max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
 
-#  server:
-#    port: 8123
-#    servlet:
-#      context-path: /api
+#server:
+#  port: 8123
+#  servlet:
+#    context-path: /api
 
-#  springdoc:
-#    swagger-ui:
-#      path: /swagger-ui.html
-#      tags-sorter: alpha
-#      operations-sorter: alpha
-#    api-docs:
-#      path: /v3/api-docs
-#    group-configs:
-#      - group: 'default'
-#        paths-to-match: '/**'
-#        packages-to-scan: com.devforgely.aimanusbackend.controller
+#springdoc:
+#  swagger-ui:
+#    path: /swagger-ui.html
+#    tags-sorter: alpha
+#    operations-sorter: alpha
+#  api-docs:
+#    path: /v3/api-docs
+#  group-configs:
+#    - group: 'default'
+#      paths-to-match: '/**'
+#      packages-to-scan: com.devforgely.aimanusbackend.controller
 
-  knife4j:
-    enable: true
-    settings:
-      language: en-gb
-#
-#  search-api:
-#    api-key: your-api-key
+knife4j:
+  enable: true
+  setting:
+    language: en
 
-  logging:
-    level:
-      org.springframework.ai: DEBUG
+search-api:
+  api-key: your-api-key
+
+logging:
+  level:
+    org.springframework.ai: DEBUG
