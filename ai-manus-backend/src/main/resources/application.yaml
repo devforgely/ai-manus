@@ -3,55 +3,34 @@ spring:
     name: ai-manus
   profiles:
     active: local
-#  datasource:
-#    url: xxx
-#    username: xxx
-#    password: xxx
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vector_database
+    username: your_username
+    password: your_password
+    driver-class-name: org.postgresql.Driver
 
   ai:
-    openai:
-      base-url: https://openrouter.ai/api
-      api-key: your-api-key
-      chat:
-        options:
-          model: openai/gpt-oss-20b:free
     ollama:
       base-url: http://localhost:11434
       chat:
         model: gemma3:1b
-
-#    mcp:
-#      client:
-#        sse:
-#          connections:
-#            server1:
-#              url: http://localhost:8127
-#        stdio:
-#          servers-configuration: classpath:mcp-servers.json
-
-#    vectorstore:
-#      pgvector:
-#        index-type: HNSW
-#        dimensions: 1536
-#        distance-type: COSINE_DISTANCE
-#        max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
+    google:
+      genai:
+        api-key: your-api-key
+        embedding:
+          text:
+            options:
+              model: text-embedding-004
+              task-type: question_answering
+        chat:
+          options:
+            model: gemini-2.5-flash-lite
 
 #server:
 #  port: 8123
 #  servlet:
 #    context-path: /api
-
-#springdoc:
-#  swagger-ui:
-#    path: /swagger-ui.html
-#    tags-sorter: alpha
-#    operations-sorter: alpha
-#  api-docs:
-#    path: /v3/api-docs
-#  group-configs:
-#    - group: 'default'
-#      paths-to-match: '/**'
-#      packages-to-scan: com.devforgely.aimanusbackend.controller
 
 knife4j:
   enable: true
