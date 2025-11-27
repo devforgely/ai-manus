@@ -4,6 +4,7 @@ import com.devforgely.aimanusbackend.advisors.LoggerAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AiManus extends ToolCallAgent {
-    public AiManus(ToolCallback[] allTools, ChatModel openAiChatModel) {
+    public AiManus(ToolCallback[] allTools, @Qualifier("googleGenAiChatModel") ChatModel aiChatModel) {
         super(allTools);
         this.setName("aiManus");
 
@@ -30,7 +31,7 @@ public class AiManus extends ToolCallAgent {
         this.setMaxSteps(20);
 
         // initialise ai client
-        ChatClient chatClient = ChatClient.builder(openAiChatModel)
+        ChatClient chatClient = ChatClient.builder(aiChatModel)
                 .defaultAdvisors(new LoggerAdvisor())
                 .build();
         this.setChatClient(chatClient);

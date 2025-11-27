@@ -13,7 +13,7 @@ public class WebSearchToolTest {
     @Test
     void searchWeb() {
         WebSearchTool webSearchTool = new WebSearchTool(searchApiKey);
-        String query = "codefather.cn";
+        String query = "w3schools.com";
         String result = webSearchTool.searchWeb(query);
         Assertions.assertNotNull(result);
     }

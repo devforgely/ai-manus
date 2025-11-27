@@ -15,7 +15,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.model.tool.ToolExecutionResult;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.google.genai.GoogleGenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class ToolCallAgent extends ReActAgent {
         super();
         this.availableTools = availableTools;
         this.toolCallingManager = ToolCallingManager.builder().build();
-        this.chatOptions = OpenAiChatOptions.builder()
+        this.chatOptions = GoogleGenAiChatOptions.builder()
                 .build();
     }
 
@@ -65,17 +65,18 @@ public class ToolCallAgent extends ReActAgent {
         try {
             ChatResponse chatResponse = getChatClient().prompt(prompt)
                     .system(getSystemPrompt())
-                    .tools(this.availableTools)
+                    .toolCallbacks(this.availableTools)
                     .call()
                     .chatResponse();
             // record response, use for deciding action
             this.toolCallChatResponse = chatResponse;
             // analyse tool call result, acquire needed tool
+            assert chatResponse != null;
             AssistantMessage assistantMessage = chatResponse.getResult().getOutput();
             List<AssistantMessage.ToolCall> toolCallList = assistantMessage.getToolCalls();
             String result = assistantMessage.getText();
-            log.info(getName() + "thinking: " + result);
-            log.info(getName() + "selected " + toolCallList.size() + " tool to use");
+            log.info("{} thinking: {}", getName(), result);
+            log.info("{} selected {} tool to use", getName(), toolCallList.size());
             String toolCallInfo = toolCallList.stream()
                     .map(toolCall -> String.format("Tool name: %s，Arguments: %s", toolCall.name(), toolCall.arguments()))
                     .collect(Collectors.joining("\n"));
@@ -90,7 +91,7 @@ public class ToolCallAgent extends ReActAgent {
                 return true;
             }
         } catch (Exception e) {
-            log.error(getName() + "thought process encountered a problem: " + e.getMessage());
+            log.error("{} thought process encountered a problem: {}", getName(), e.getMessage());
             getMessageList().add(new AssistantMessage("An error occurred while processing: " + e.getMessage()));
             return false;
         }
