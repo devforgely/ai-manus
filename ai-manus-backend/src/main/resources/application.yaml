@@ -27,10 +27,10 @@ spring:
           options:
             model: gemini-2.5-flash-lite
 
-#server:
-#  port: 8123
-#  servlet:
-#    context-path: /api
+server:
+  port: 8123
+  servlet:
+    context-path: /api
 
 knife4j:
   enable: true
