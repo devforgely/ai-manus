@@ -45,3 +45,9 @@ The project focuses on the practical application of the Spring AI development fr
 ### Project Framework Design
 
 ![Project Framework Design](/img/framework_design.JPG)
+
+### Project Frontend
+
+![Home Page](/img/web_home.JPG)
+
+![Focus Master Page](/img/focus_master_page.JPG)

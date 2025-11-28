@@ -1,5 +1,6 @@
 package com.devforgely.aimanusbackend.agents;
 
+import com.devforgely.aimanusbackend.agents.model.AgentResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -13,31 +14,31 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class ReActAgent extends BaseAgent {
     /**
      * Process current state & decide next action
-     * @return true if require action else false
+     * @return whether to continue act and the message from agent
      */
-    public abstract boolean think();
+    public abstract AgentResult think();
 
     /**
      * Act
      * @return result of action
      */
-    public abstract String act();
+    public abstract AgentResult act();
 
     /**
      * Process single step: think & act
      * @return result of step execution
      */
     @Override
-    public String step() {
+    public AgentResult step() {
         try {
-            boolean shouldAct = think();
-            if (!shouldAct) {
-                return "Complete Think, No Action";
+            AgentResult thinkResult = think();
+            if (!thinkResult.act()) {
+                return thinkResult;
             }
             return act();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Step execution failed: " + e.getMessage();
+            return new AgentResult(false, "Step execution failed: " + e.getMessage());
         }
     }
 }

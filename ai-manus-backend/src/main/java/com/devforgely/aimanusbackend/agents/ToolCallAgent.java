@@ -2,6 +2,7 @@ package com.devforgely.aimanusbackend.agents;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.devforgely.aimanusbackend.agents.model.AgentResult;
 import com.devforgely.aimanusbackend.agents.model.AgentState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,6 +43,7 @@ public class ToolCallAgent extends ReActAgent {
         this.availableTools = availableTools;
         this.toolCallingManager = ToolCallingManager.builder().build();
         this.chatOptions = GoogleGenAiChatOptions.builder()
+                .internalToolExecutionEnabled(false)
                 .build();
     }
 
@@ -51,7 +53,7 @@ public class ToolCallAgent extends ReActAgent {
      * @return boolean indicating require action
      */
     @Override
-    public boolean think()
+    public AgentResult think()
     {
         if (StrUtil.isNotBlank(getNextStepPrompt())) {
             UserMessage userMessage = new UserMessage(getNextStepPrompt());
@@ -76,7 +78,10 @@ public class ToolCallAgent extends ReActAgent {
             List<AssistantMessage.ToolCall> toolCallList = assistantMessage.getToolCalls();
             String result = assistantMessage.getText();
             log.info("{} thinking: {}", getName(), result);
-            log.info("{} selected {} tool to use", getName(), toolCallList.size());
+            if (!toolCallList.isEmpty())
+            {
+                log.info("{} selected {} tool to use", getName(), toolCallList.size());
+            }
             String toolCallInfo = toolCallList.stream()
                     .map(toolCall -> String.format("Tool name: %s，Arguments: %s", toolCall.name(), toolCall.arguments()))
                     .collect(Collectors.joining("\n"));
@@ -85,15 +90,15 @@ public class ToolCallAgent extends ReActAgent {
             if (toolCallList.isEmpty()) {
                 // Only required to manually add assistant message when no tool is used
                 getMessageList().add(assistantMessage);
-                return false;
+                return new AgentResult(false, result);
             } else {
                 // When tool is used, it will automatically record assistant message
-                return true;
+                return new AgentResult(true, result);
             }
         } catch (Exception e) {
             log.error("{} thought process encountered a problem: {}", getName(), e.getMessage());
             getMessageList().add(new AssistantMessage("An error occurred while processing: " + e.getMessage()));
-            return false;
+            return new AgentResult(false, "Encountered a problem.");
         }
     }
 
@@ -103,9 +108,9 @@ public class ToolCallAgent extends ReActAgent {
      * @return execution result
      */
     @Override
-    public String act() {
+    public AgentResult act() {
         if (!toolCallChatResponse.hasToolCalls()) {
-            return "No required tool calls";
+            return new AgentResult(false, "No required tool calls");
         }
         // call tool
         Prompt prompt = new Prompt(getMessageList(), this.chatOptions);
@@ -114,18 +119,19 @@ public class ToolCallAgent extends ReActAgent {
         setMessageList(toolExecutionResult.conversationHistory());
         ToolResponseMessage toolResponseMessage = (ToolResponseMessage) CollUtil.getLast(toolExecutionResult.conversationHistory());
 
+        String results = toolResponseMessage.getResponses().stream()
+                .map(response -> "tool " + response.name() + " returned: " + response.responseData())
+                .collect(Collectors.joining("\n"));
+        log.info(results);
+
         // determine whether to terminate tool use
         boolean terminateToolCalled = toolResponseMessage.getResponses().stream()
                 .anyMatch(response -> response.name().equals("doTerminate"));
 
         if (terminateToolCalled) {
             setState(AgentState.FINISHED);
+            return new AgentResult(false, results);
         }
-
-        String results = toolResponseMessage.getResponses().stream()
-                .map(response -> "tool " + response.name() + " returned: " + response.responseData())
-                .collect(Collectors.joining("\n"));
-        log.info(results);
-        return results;
+        return new AgentResult(true, results);
     }
 }

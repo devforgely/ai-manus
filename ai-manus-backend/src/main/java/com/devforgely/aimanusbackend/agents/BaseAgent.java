@@ -1,6 +1,7 @@
 package com.devforgely.aimanusbackend.agents;
 
 import cn.hutool.core.util.StrUtil;
+import com.devforgely.aimanusbackend.agents.model.AgentResult;
 import com.devforgely.aimanusbackend.agents.model.AgentState;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +58,17 @@ public abstract class BaseAgent {
                 currentStep = stepNumber;
                 log.info("Executing step {}/{}", stepNumber, maxSteps);
                 // execute single step
-                String stepResult = step();
-                String result = "Step " + stepNumber + ": " + stepResult;
+                AgentResult stepResult = step();
+                String result;
+
+                if (!stepResult.act()) {
+                    this.state = AgentState.FINISHED;
+                    result = stepResult.content();
+                }
+                else
+                {
+                    result = "Step " + stepNumber + ": " + stepResult.content();
+                }
                 results.add(result);
             }
             if (currentStep >= maxSteps) {
@@ -110,14 +120,23 @@ public abstract class BaseAgent {
                     currentStep = stepNumber;
                     log.info("Executing step {}/{}", stepNumber, maxSteps);
                     // execute single step
-                    String stepResult = step();
-                    String result = "Step " + stepNumber + ": " + stepResult;
+                    AgentResult stepResult = step();
+                    String result;
+
+                    if (!stepResult.act()) {
+                        this.state = AgentState.FINISHED;
+                        result = "[Done]" + stepResult.content();
+                    }
+                    else
+                    {
+                        result = "Step " + stepNumber + ": " + stepResult.content();
+                    }
                     // Emit every result
                     sseEmitter.send(result);
                 }
                 if (currentStep >= maxSteps) {
                     state = AgentState.FINISHED;
-                    sseEmitter.send("Terminated: Reached max steps (" + maxSteps + ")");
+                    sseEmitter.send("[Terminate]" + "Reached max steps (" + maxSteps + ")");
                 }
                 sseEmitter.complete();
             } catch (Exception e) {
@@ -155,7 +174,7 @@ public abstract class BaseAgent {
     /**
      * Define single agent step
      */
-    public abstract String step();
+    public abstract AgentResult step();
 
     /**
      * Resource cleanup

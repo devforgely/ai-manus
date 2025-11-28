@@ -11,6 +11,6 @@ public class TerminateTool {
             "When you have finished all the tasks, call this tool to end the work.
             """)
     public String doTerminate() {
-        return "Request Terminated";
+        return "Chat Completed";
     }
 }
